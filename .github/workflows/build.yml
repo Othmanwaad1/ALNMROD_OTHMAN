@@ -1,32 +1,33 @@
 name: Build APK
+
 on:
   push:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      - name: Install deps
+
+      - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y git zip unzip openjdk-17-jdk \
-            autoconf libtool pkg-config zlib1g-dev libncurses-dev \
-            cmake libffi-dev libssl-dev python3-pip
-          sudo dpkg --add-architecture i386
-          sudo apt update
-          sudo apt install -y libc6-i386 lib32z1
-          pip install buildozer
+          pip install --upgrade buildozer python-for-android cython virtualenv
+
       - name: Build APK
         run: |
           yes | buildozer -v android debug
         env:
           BUILDOZER_WARN_ON_ROOT: 1
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: ALNMROD_APK
-          path: bin/
+          path: bin/*.apk
