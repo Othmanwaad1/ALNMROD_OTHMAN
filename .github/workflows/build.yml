@@ -1,0 +1,30 @@
+name: Build APK
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install deps
+        run: |
+          sudo apt update
+          sudo apt install -y git zip unzip openjdk-17-jdk \
+            autoconf libtool pkg-config zlib1g-dev libncurses-dev \
+            cmake libffi-dev libssl-dev python3-pip
+          sudo dpkg --add-architecture i386
+          sudo apt update
+          sudo apt install -y libc6-i386 lib32z1
+          pip install buildozer
+      - name: Build
+        run: buildozer -v android debug
+        env:
+          BUILDOZER_WARN_ON_ROOT: 1
+      - name: Upload
+        uses: actions/upload-artifact@v3
+        with:
+          name: ALNMROD_APK
+          path: bin/
