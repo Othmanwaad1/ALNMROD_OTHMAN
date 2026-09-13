@@ -21,7 +21,8 @@ jobs:
           sudo apt install -y libc6-i386 lib32z1
           pip install buildozer
       - name: Build APK
-        run: buildozer -v android debug
+        run: |
+          yes | buildozer -v android debug
         env:
           BUILDOZER_WARN_ON_ROOT: 1
       - name: Upload APK
